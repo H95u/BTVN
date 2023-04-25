@@ -1,3 +1,5 @@
+package BTVN.src;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -5,13 +7,13 @@ import java.util.Scanner;
 public class Main {
     public static Scanner scanner = new Scanner(System.in);
 
-    public static Account register(ArrayList<Account> accounts) {
+    public static Account register() {
         String userName;
         boolean check;
         do {
             System.out.println("Nhập userName");
             userName = scanner.nextLine();
-            check = checkRegister(accounts, userName);
+            check = checkRegister(userName);
             if (!check) System.out.println("Nhập lại do trùng username!!");
         } while (!check);
         System.out.println("Nhập passWord");
@@ -25,10 +27,18 @@ public class Main {
         return new Account(userName, passWord, fullName, phoneNumber, address);
     }
 
-    public static boolean checkRegister(ArrayList<Account> accounts, String userName) {
-        for (Account account : accounts) {
-            if (account.getUserName().equals(userName))
-                return false;
+    public static boolean checkRegister(String userName) {
+        File file = new File("D:\\hieujava\\BTVN\\src\\Account.txt");
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            String c;
+            String[] str;
+            while ((c = bufferedReader.readLine()) != null) {
+                str = c.split(",");
+                if (userName.equals(str[1])) return false;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return true;
     }
@@ -36,7 +46,8 @@ public class Main {
     public static void writeAccount(ArrayList<Account> accounts) {
         File file = new File("D:\\hieujava\\BTVN\\src\\Account.txt");
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            FileWriter fileWriter = new FileWriter(file, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             for (Account account : accounts) {
                 bufferedWriter.write(account.toString() + "\n");
             }
@@ -111,7 +122,7 @@ public class Main {
             }
             switch (choice) {
                 case 1:
-                    Account account = register(accounts);
+                    Account account = register();
                     accounts.add(account);
                     writeAccount(accounts);
                     System.out.println("Đăng ký thành công");
